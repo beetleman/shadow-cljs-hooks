@@ -3,15 +3,12 @@
           {:target      :browser
            :output-dir  "public/js"
            :asset-path  "/js"
-           :build-hooks [(shadow-cljs-hooks.core/index {:index-html-path
-                                                        "public/index.html"})]
+           :build-hooks [(shadow-cljs-hooks.core/index {:entry-point app.main/init})]
            :modules     {:main {:entries [app.main]}}
 
            :release {:module-hash-names true
                      :output-dir        "build/js"
-
-                     :build-hooks [(shadow-cljs-hooks.core/index {:index-html-path
-                                                                  "build/index.html"})]}
+                     :build-hooks [(shadow-cljs-hooks.core/index {:entry-point app.main/init})]}
 
            :devtools {:http-root "public"
                       :http-port 8080}}}}

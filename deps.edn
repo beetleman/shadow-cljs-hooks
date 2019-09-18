@@ -1,6 +1,7 @@
 {:paths ["src"]
 
  :deps {com.taoensso/timbre {:mvn/version "4.10.0"}
+        expound             {:mvn/version "0.7.2"}
         hiccup              {:mvn/version "1.0.5"}}
 
  :aliases {:dev {:extra-paths ["test" "example"]

@@ -1,34 +1,64 @@
 (ns shadow-cljs-hooks.index
-  (:require [hiccup.core :refer [html]]))
+  (:require [clojure.spec.alpha :as s]
+            [clojure.string :as string]
+            [hiccup.core :refer [html]]
+            [shadow-cljs-hooks.spec :as hooks.spec]))
 
 (defn read-edn [path]
   (clojure.edn/read-string (slurp path)))
 
-(defn get-root [build-state]
+
+(defn output-dir [build-state]
   (get-in build-state [:shadow.build/config :output-dir]))
 
+(defn asset-path [build-state]
+  (get-in build-state [:shadow.build/config :asset-path]))
+
+
 (defn get-manifest [build-state]
-  (read-edn (str (get-root build-state)
-                 "/"
-                 "manifest.edn")))
+  (-> (output-dir build-state)
+      (str "/manifest.edn")
+      read-edn))
 
-(defn template [manifest]
-  (html
-   [:html {:lang "en"}
-    [:head
-     [:meta {:charset "utf-8"}]]
-    [:body
-     [:div#app "loading..."]
+(defn entry-point-js [{:keys [entry-point]}]
+  (-> entry-point
+      str
+      (string/replace #"-" "_")
+      (string/replace #"/" ".")
+      (str "()")))
 
-     [:link
-      {:href "https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-       :rel  "stylesheet"}]
+(defn template [build-state options]
+  (let [output-name (-> (get-manifest build-state)
+                        first
+                        :output-name)
+        main-src (str (asset-path build-state)
+                      "/"
+                      output-name)
+        js (entry-point-js options)]
+    (html
+     [:html {:lang "en"}
+      [:head
+       [:meta {:charset "utf-8"}]]
+      [:body
+       [:div#app "Loading..."]
+       [:script {:src main-src}]
+       [:script js]]])))
 
-     [:script {:src (str "js/" (-> manifest first :output-name))}]
-     [:script "app.main.init();"]]]))
+(s/def ::path string?)
+(s/def ::entry-point symbol?)
+(s/def ::options (s/keys :opt-un [::path]
+                         :req-un [::entry-point]))
+
+(defn conform-options [build-state options]
+  (merge options {:path (string/replace (output-dir build-state)
+                                        (re-pattern (asset-path build-state))
+                                        "")}))
 
 (defn write-html [build-state options]
-  (let [manifest   (get-manifest build-state)
-        index-html (template manifest)]
-    (spit (:index-html-path options)
+  {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)
+         (hooks.spec/valid? ::options options)]}
+  (let [{:keys [path]
+         :as options} (conform-options build-state options)
+        index-html (template build-state options)]
+    (spit (str path "/" "index.html")
           index-html)))

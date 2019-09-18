@@ -4,6 +4,8 @@
 
 (defn index
   {:shadow.build/stage :flush}
-  [build-state options]
-  (hooks.index/write-html build-state options)
-  build-state)
+  ([build-state]
+   (index build-state {}))
+  ([build-state options]
+   (hooks.index/write-html build-state options)
+   build-state))
