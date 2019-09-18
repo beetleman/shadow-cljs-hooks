@@ -1,0 +1,9 @@
+/.cpcache
+/.shadow-cljs
+/node_modules
+
+/build/*
+!/build/.keep
+/public/*
+!/public/.keep
+/.nrepl-port
