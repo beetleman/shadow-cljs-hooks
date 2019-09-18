@@ -7,3 +7,4 @@
 /public/*
 !/public/.keep
 /.nrepl-port
+/.rebl
