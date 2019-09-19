@@ -27,7 +27,9 @@
       (string/replace #"/" ".")
       (str "()")))
 
-(defn template [build-state options]
+(defn template [build-state
+                {:keys [title links scripts lang app-mount]
+                 :as options}]
   (let [output-name (-> (get-manifest build-state)
                         first
                         :output-name)
@@ -36,23 +38,43 @@
                       output-name)
         js (entry-point-js options)]
     (html
-     [:html {:lang "en"}
+     [:html {:lang lang}
       [:head
-       [:meta {:charset "utf-8"}]]
+       [:title title]
+       [:meta {:charset "utf-8"}]
+       (for [href links]
+         [:link {:rel "stylesheet"
+                 :type "text/css"
+                 :href href}])]
       [:body
-       [:div#app "Loading..."]
+       [app-mount "Loading..."]
+       (for [src scripts]
+         [:script {:src src}])
        [:script {:src main-src}]
        [:script js]]])))
 
 (s/def ::path string?)
+(s/def ::lang string?)
+(s/def ::links (s/coll-of string?))
+(s/def ::scripts (s/coll-of string?))
 (s/def ::entry-point symbol?)
-(s/def ::options (s/keys :opt-un [::path]
+(s/def ::app-mount keyword?)
+(s/def ::options (s/keys :opt-un [::path
+                                  ::lang
+                                  ::title
+                                  ::scripts
+                                  ::links]
                          :req-un [::entry-point]))
 
 (defn conform-options [build-state options]
   (merge options {:path (string/replace (output-dir build-state)
                                         (re-pattern (asset-path build-state))
-                                        "")}))
+                                        "")
+                  :title "ClojureScript 🥳🏆"
+                  :links ["https://cdn.jsdelivr.net/npm/destyle.css@1.0.10/destyle.css"]
+                  :scripts []
+                  :lang "en"
+                  :app-mount :div#app}))
 
 (defn write-html [build-state options]
   {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)

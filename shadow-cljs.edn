@@ -8,7 +8,7 @@
 
            :release {:module-hash-names true
                      :output-dir        "build/js"
-                     :build-hooks [(shadow-cljs-hooks.core/index {:entry-point app.main/init})]}
+                     :build-hooks       [(shadow-cljs-hooks.core/index {:entry-point app.main/init})]}
 
            :devtools {:http-root "public"
                       :http-port 8080}}}}

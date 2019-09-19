@@ -16,5 +16,5 @@
   (js/console.log "start")
   (app "app"))
 
-(defn init []
+(defn ^:export init []
   (start))
