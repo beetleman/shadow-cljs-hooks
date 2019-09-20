@@ -53,8 +53,8 @@
        [:script {:src main-src}]
        [:script js]]])))
 
-(s/def ::path string?)
-(s/def ::lang string?)
+(s/def ::path (s/and string? (complement empty?)))
+(s/def ::lang (s/and string? (complement empty?)))
 (s/def ::links (s/coll-of string?))
 (s/def ::scripts (s/coll-of string?))
 (s/def ::entry-point symbol?)

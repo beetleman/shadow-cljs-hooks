@@ -5,7 +5,8 @@
 
 
 (s/def ::output-dir (s/and string? (complement empty?)))
-(s/def :shadow.build/config (s/keys :req-un [::output-dir]))
+(s/def ::asset-path (s/and string? (complement empty?)))
+(s/def :shadow.build/config (s/keys :req-un [::output-dir ::asset-path]))
 (s/def ::build-state (s/keys :req [:shadow.build/config]))
 
 
