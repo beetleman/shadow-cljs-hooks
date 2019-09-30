@@ -19,40 +19,36 @@
       (str "/manifest.edn")
       read-edn))
 
+(def entry-point-js-error-message
+  "console.debug('shadow-cljs-hooks.index: ', 'no `:entry-point` provided.')")
+
 (defn entry-point-js [{:keys [entry-point]}]
   (if entry-point
     (-> entry-point
         str
         (string/replace #"-" "_")
         (string/replace #"/" ".")
-        (str "()"))
-    "console.debug('shadow-cljs-hooks.index: ', 'no `:entry-point` provided.')"))
+        (str "();"))
+    entry-point-js-error-message))
 
-(defn template [build-state
+(defn template [main-src
                 {:keys [title links scripts lang app-mount]
                  :as options}]
-  (let [output-name (-> (get-manifest build-state)
-                        first
-                        :output-name)
-        main-src (str (asset-path build-state)
-                      "/"
-                      output-name)
-        js (entry-point-js options)]
-    (html
-     [:html {:lang lang}
-      [:head
-       [:title title]
-       [:meta {:charset "utf-8"}]
-       (for [href links]
-         [:link {:rel "stylesheet"
-                 :type "text/css"
-                 :href href}])]
-      [:body
-       [app-mount "Loading..."]
-       (for [src scripts]
-         [:script {:src src}])
-       [:script {:src main-src}]
-       [:script js]]])))
+  (html
+   [:html {:lang lang}
+    [:head
+     [:title title]
+     [:meta {:charset "utf-8"}]
+     (for [href links]
+       [:link {:rel "stylesheet"
+               :type "text/css"
+               :href href}])]
+    [:body
+     [app-mount "Loading..."]
+     (for [src scripts]
+       [:script {:src src}])
+     [:script {:src main-src}]
+     [:script (entry-point-js options)]]]))
 
 (s/def ::path string?)
 (s/def ::links (s/coll-of (s/and string? (complement empty?))))
@@ -60,28 +56,35 @@
 (s/def ::title (s/and string? (complement empty?)))
 (s/def ::entry-point symbol?)
 (s/def ::app-mount keyword?)
+(s/def ::lang ::lang/codes)
 (s/def ::options (s/keys :opt-un [::path
-                                  ::lang/codes
+                                  ::lang
                                   ::title
                                   ::scripts
                                   ::entry-point
                                   ::links]))
 
 (defn conform-options [build-state options]
-  (merge options {:path      (string/replace (output-dir build-state)
-                                             (re-pattern (asset-path build-state))
-                                             "")
-                  :title     "ClojureScript 🥳🏆"
-                  :links     ["https://cdn.jsdelivr.net/npm/destyle.css@1.0.10/destyle.css"]
-                  :scripts   []
-                  :lang      "en"
-                  :app-mount :div#app}))
+  (merge {:path      (string/replace (output-dir build-state)
+                                     (re-pattern (asset-path build-state))
+                                     "")
+          :title     "ClojureScript 🥳🏆"
+          :links     ["https://cdn.jsdelivr.net/npm/destyle.css@1.0.10/destyle.css"]
+          :scripts   []
+          :lang      "en"
+          :app-mount :div#app}
+         options))
 
 (defn write-html [build-state options]
   {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)
          (hooks.spec/valid? ::options options)]}
   (let [{:keys [path]
          :as options} (conform-options build-state options)
-        index-html (template build-state options)]
+        main-src (str (asset-path build-state)
+                      "/"
+                      (-> (get-manifest build-state)
+                          first
+                          :output-name))
+        index-html (template main-src options)]
     (spit (str path "/" "index.html")
           index-html)))
