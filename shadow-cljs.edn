@@ -5,13 +5,16 @@
           {:target      :browser
            :output-dir  "public/js"
            :asset-path  "/js"
-           :build-hooks [(shadow-cljs-hooks.core/index)]
+           :build-hooks [(shadow-cljs-hooks.fulcro-css/hook {:component  app.main/Root
+                                                             :output-dir "public/css"
+                                                             :asset-path "/css"})
+                         (shadow-cljs-hooks.index/hook)]
            :modules     {:main {:init-fn app.main/init
                                 :entries [app.main]}}
 
            :release {:module-hash-names true
                      :output-dir        "build/js"
-                     :build-hooks       [(shadow-cljs-hooks.core/index)]}
+                     :build-hooks       [(shadow-cljs-hooks.index/hook)]}
 
            :devtools {:after-load app.main/refresh
                       :preloads   [com.fulcrologic.fulcro.inspect.preload] ;; fulcro  specific

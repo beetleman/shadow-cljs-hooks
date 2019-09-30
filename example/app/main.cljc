@@ -1,8 +1,8 @@
 (ns app.main
-  (:require [com.fulcrologic.fulcro-css.localized-dom :as dom]
+  (:require #?(:clj [com.fulcrologic.fulcro.dom-server :as dom]
+               :cljs [com.fulcrologic.fulcro-css.localized-dom :as dom])
             [com.fulcrologic.fulcro.application :as app]
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
-            [com.fulcrologic.fulcro-css.css-injection :as inj]
             [com.fulcrologic.fulcro.mutations :as m]))
 
 (defonce app (app/fulcro-app))
@@ -13,7 +13,7 @@
                             :padding          "5px 20px"
                             :text-align       :center
                             :text-decoration  :none
-                            :font-size        "16px"}]]
+                            :font-size        "20px"}]]
    :ident         (fn []
                     [::count-button :singleton])
    :query         [::counter]
@@ -21,6 +21,7 @@
   (dom/button :.root
               {:onClick #(m/set-value! this ::counter (inc counter))}
               "click me (" counter ")"))
+
 
 (def ui-count-button (comp/factory CountButton))
 
@@ -30,7 +31,6 @@
    :initial-state (fn [_]
                     {:ui/button (comp/get-initial-state CountButton)})}
   (dom/div :.root
-           (inj/style-element {:component Root}) ;TODO: move to hook
            (ui-count-button button)))
 
 (defn ^:export init

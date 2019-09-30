@@ -3,6 +3,7 @@
             [clojure.string :as string]
             [hiccup.core :refer [html]]
             [shadow-cljs-hooks.lang :as lang]
+            [shadow-cljs-hooks.css :as css]
             [shadow-cljs-hooks.spec :as hooks.spec]))
 
 (defn read-edn [path]
@@ -75,11 +76,17 @@
           :app-mount :div#app}
          options))
 
+(defn add-css-link [build-state options]
+  (if-let [link (css/get-path build-state)]
+    (update options :links conj link)
+    options))
+
 (defn write-html [build-state options]
   {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)
          (hooks.spec/valid? ::options options)]}
   (let [{:keys [path]
-         :as options} (conform-options build-state options)
+         :as options} (->> (conform-options build-state options)
+                           (add-css-link build-state))
         main-src (str (asset-path build-state)
                       "/"
                       (-> (get-manifest build-state)
@@ -87,4 +94,13 @@
                           :output-name))
         index-html (template main-src options)]
     (spit (str path "/" "index.html")
-          index-html)))
+          index-html)
+    build-state))
+
+
+(defn hook
+  {:shadow.build/stage :flush}
+  ([build-state]
+   (hook build-state {}))
+  ([build-state options]
+   (write-html build-state options)))

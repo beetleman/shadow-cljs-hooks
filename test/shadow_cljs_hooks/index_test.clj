@@ -38,3 +38,12 @@
                 (string? (sut/template "js/main.js"
                                        (sut/conform-options build-state
                                                             options)))))
+
+(defmacro on-flush? [hook]
+  `(= (:shadow.build/stage (meta #'~hook))
+      :flush))
+
+
+(t/deftest test-hook
+  (t/testing "index hook run on flush"
+    (t/is (on-flush? sut/hook))))

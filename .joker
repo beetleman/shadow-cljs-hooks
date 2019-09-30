@@ -1,0 +1,6 @@
+{:known-macros
+ [com.fulcrologic.fulcro.components/defsc]
+ :known-tags
+ []
+ :ignored-unused-namespaces
+ [clojure.spec.alpha clojure.test]}
