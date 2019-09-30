@@ -1,5 +1,5 @@
-{:deps   {:aliases [:dev]}
- :nrepl  {:middleware [refactor-nrepl.middleware/wrap-refactor]}
+{:deps  {:aliases [:dev]}
+ :nrepl {:middleware [refactor-nrepl.middleware/wrap-refactor]}
 
  :builds {:app
           {:target      :browser
@@ -12,5 +12,7 @@
                      :output-dir        "build/js"
                      :build-hooks       [(shadow-cljs-hooks.core/index {:entry-point app.main/init})]}
 
-           :devtools {:http-root "public"
-                      :http-port 8080}}}}
+           :devtools {:after-load app.main/refresh
+                      :preloads   [com.fulcrologic.fulcro.inspect.preload] ;; fulcro  specific
+                      :http-root  "public"
+                      :http-port  8080}}}}
