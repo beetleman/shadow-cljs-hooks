@@ -20,11 +20,13 @@
       read-edn))
 
 (defn entry-point-js [{:keys [entry-point]}]
-  (-> entry-point
-      str
-      (string/replace #"-" "_")
-      (string/replace #"/" ".")
-      (str "()")))
+  (if entry-point
+    (-> entry-point
+        str
+        (string/replace #"-" "_")
+        (string/replace #"/" ".")
+        (str "()"))
+    "console.debug('shadow-cljs-hooks.index: ', 'no `:entry-point` provided.')"))
 
 (defn template [build-state
                 {:keys [title links scripts lang app-mount]
@@ -62,8 +64,8 @@
                                   ::lang/codes
                                   ::title
                                   ::scripts
-                                  ::links]
-                         :req-un [::entry-point]))
+                                  ::entry-point
+                                  ::links]))
 
 (defn conform-options [build-state options]
   (merge options {:path      (string/replace (output-dir build-state)
