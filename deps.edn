@@ -16,9 +16,11 @@
                                binaryage/devtools                {:mvn/version "0.9.10"}}}
 
            :test {:extra-paths ["test"]
-                  :extra-deps  {org.clojure/clojure    {:mvn/version "1.10.1"}
-                                org.clojure/test.check {:mvn/version "0.10.0"}
-                                lambdaisland/kaocha    {:mvn/version "0.0-541"}}}
+                  :extra-deps  {org.clojure/clojure               {:mvn/version "1.10.1"}
+                                org.clojure/test.check            {:mvn/version "0.10.0"}
+                                lambdaisland/kaocha               {:mvn/version "0.0-541"}
+                                com.fulcrologic/fulcro            {:mvn/version "3.0.1"}
+                                com.fulcrologic/fulcro-garden-css {:mvn/version "3.0.7"}}}
 
            :outdated {:extra-deps {olical/depot {:mvn/version "1.8.4"}}
                       :main-opts  ["-m" "depot.outdated.main"]}}}

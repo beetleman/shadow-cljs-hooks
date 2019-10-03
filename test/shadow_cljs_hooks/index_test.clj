@@ -1,6 +1,7 @@
 (ns shadow-cljs-hooks.index-test
   (:require [shadow-cljs-hooks.index :as sut]
             [shadow-cljs-hooks.spec :as hooks.spec]
+            [shadow-cljs-hooks.test.util :as test.util]
             [clojure.test :as t :refer [deftest]]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer [defspec]]
@@ -40,14 +41,9 @@
                                        (sut/conform-options build-state
                                                             options)))))
 
-(defmacro on-flush? [hook]
-  `(= (:shadow.build/stage (meta #'~hook))
-      :flush))
-
-
 (t/deftest test-hook
   (t/testing "index hook run on flush"
-    (t/is (on-flush? sut/hook))))
+    (t/is (test.util/on-flush? sut/hook))))
 
 
 (s/def ::output-name (hooks.spec/file-name-spec "js"))
@@ -61,15 +57,17 @@
   (boolean (and (string? s)
                 (re-matches #"<html lang=\".+\">.*</html>" s))))
 
-(defspec test-check-write-html!
+(defspec test-check-hook*
   100
   (prop/for-all [manifest (s/gen ::manifest)
                  options (s/gen ::sut/options)
                  build-state (s/gen ::hooks.spec/build-state)]
-                (with-redefs [sut/write-index-html! (fn [path html]
-                                                      (assert (s/valid? ::sut/path path)
-                                                              (str "path should conform " ::sut/path))
-                                                      (assert (html? html)
-                                                              "not valid html"))
-                              sut/get-manifest! (fn [_] manifest)]
-                  (sut/write-html! build-state options))))
+                (= build-state
+                   (sut/hook* build-state
+                              options
+                              {:write-html   (fn [path html]
+                                               (assert (s/valid? ::sut/path path)
+                                                       (str "path should conform " ::sut/path))
+                                               (assert (html? html)
+                                                       "not valid html"))
+                               :get-manifest (constantly manifest)}))))

@@ -83,11 +83,12 @@
     (update options :links conj link)
     options))
 
-(defn write-index-html! [path index-html]
+(defn write-html! [path index-html]
   (spit (str path "/" "index.html")
         index-html))
 
-(defn write-html! [build-state options]
+(defn hook* [build-state options {:keys [get-manifest
+                                         write-html]}]
   {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)
          (hooks.spec/valid? ::options options)]}
   (let [{:keys [path]
@@ -95,17 +96,18 @@
                            (add-css-link build-state))
         main-src (str (asset-path build-state)
                       "/"
-                      (-> (get-manifest! build-state)
+                      (-> (get-manifest build-state)
                           first
                           :output-name))
         index-html (template main-src options)]
-    (write-index-html! path index-html)
+    (write-html path index-html)
     build-state))
-
 
 (defn hook
   {:shadow.build/stage :flush}
   ([build-state]
    (hook build-state {}))
   ([build-state options]
-   (write-html! build-state options)))
+   (hook* build-state options
+          {:write-html   write-html!
+           :get-manifest get-manifest!})))

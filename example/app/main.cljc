@@ -1,5 +1,5 @@
 (ns app.main
-  (:require #?(:clj [com.fulcrologic.fulcro.dom-server :as dom]
+  (:require #?(:clj [com.fulcrologic.fulcro-css.localized-dom-server :as dom]
                :cljs [com.fulcrologic.fulcro-css.localized-dom :as dom])
             [com.fulcrologic.fulcro.application :as app]
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
