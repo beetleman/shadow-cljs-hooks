@@ -1,13 +1,14 @@
 (ns shadow-cljs-hooks.index
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.edn :as edn]
+            [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [hiccup.core :refer [html]]
-            [shadow-cljs-hooks.lang :as lang]
             [shadow-cljs-hooks.css :as css]
+            [shadow-cljs-hooks.lang :as lang]
             [shadow-cljs-hooks.spec :as hooks.spec]))
 
-(defn read-edn [path]
-  (clojure.edn/read-string (slurp path)))
+(defn read-edn! [path]
+  (edn/read-string (slurp path)))
 
 (defn output-dir [build-state]
   (get-in build-state [:shadow.build/config :output-dir]))
@@ -15,10 +16,11 @@
 (defn asset-path [build-state]
   (get-in build-state [:shadow.build/config :asset-path]))
 
-(defn get-manifest [build-state]
-  (-> (output-dir build-state)
-      (str "/manifest.edn")
-      read-edn))
+(defn get-manifest-path [build-state]
+  (str (output-dir build-state) "/manifest.edn"))
+
+(defn get-manifest! [build-state]
+  (read-edn! get-manifest-path))
 
 (def entry-point-js-error-message
   "console.debug('shadow-cljs-hooks.index: ', 'no `:entry-point` provided.')")
@@ -52,9 +54,9 @@
      [:script (entry-point-js options)]]]))
 
 (s/def ::path string?)
-(s/def ::links (s/coll-of (s/and string? (complement empty?))))
-(s/def ::scripts (s/coll-of (s/and string? (complement empty?))))
-(s/def ::title (s/and string? (complement empty?)))
+(s/def ::links (s/coll-of ::hooks.spec/not-empty-string))
+(s/def ::scripts (s/coll-of ::hooks.spec/not-empty-string))
+(s/def ::title ::hooks.spec/not-empty-string)
 (s/def ::entry-point symbol?)
 (s/def ::app-mount keyword?)
 (s/def ::lang ::lang/codes)
@@ -81,7 +83,11 @@
     (update options :links conj link)
     options))
 
-(defn write-html [build-state options]
+(defn write-index-html! [path index-html]
+  (spit (str path "/" "index.html")
+        index-html))
+
+(defn write-html! [build-state options]
   {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)
          (hooks.spec/valid? ::options options)]}
   (let [{:keys [path]
@@ -89,12 +95,11 @@
                            (add-css-link build-state))
         main-src (str (asset-path build-state)
                       "/"
-                      (-> (get-manifest build-state)
+                      (-> (get-manifest! build-state)
                           first
                           :output-name))
         index-html (template main-src options)]
-    (spit (str path "/" "index.html")
-          index-html)
+    (write-index-html! path index-html)
     build-state))
 
 
@@ -103,4 +108,4 @@
   ([build-state]
    (hook build-state {}))
   ([build-state options]
-   (write-html build-state options)))
+   (write-html! build-state options)))

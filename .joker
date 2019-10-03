@@ -1,5 +1,7 @@
 {:known-macros
- [com.fulcrologic.fulcro.components/defsc]
+ [com.fulcrologic.fulcro.components/defsc
+  clojure.test.check.properties/for-all
+  clojure.test.check.clojure-test/defspec]
  :known-tags
  []
  :ignored-unused-namespaces

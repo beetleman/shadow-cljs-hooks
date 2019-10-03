@@ -5,7 +5,8 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer [defspec]]
             [clojure.set :as set]
-            [clojure.spec.alpha :as s]))
+            [clojure.spec.alpha :as s]
+            [clojure.spec.gen.alpha :as gen]))
 
 
 (defspec test-check-conform-options
@@ -47,3 +48,28 @@
 (t/deftest test-hook
   (t/testing "index hook run on flush"
     (t/is (on-flush? sut/hook))))
+
+
+(s/def ::output-name (hooks.spec/file-name-spec "js"))
+(s/def ::manifest (s/with-gen vector?
+                    #(gen/fmap (fn [output-name]
+                                 [{:output-name output-name}])
+                               (hooks.spec/file-name-generator "edn"))))
+
+(defn html? [s]
+  "dummy html validator"
+  (boolean (and (string? s)
+                (re-matches #"<html lang=\".+\">.*</html>" s))))
+
+(defspec test-check-write-html!
+  100
+  (prop/for-all [manifest (s/gen ::manifest)
+                 options (s/gen ::sut/options)
+                 build-state (s/gen ::hooks.spec/build-state)]
+                (with-redefs [sut/write-index-html! (fn [path html]
+                                                      (assert (s/valid? ::sut/path path)
+                                                              (str "path should conform " ::sut/path))
+                                                      (assert (html? html)
+                                                              "not valid html"))
+                              sut/get-manifest! (fn [_] manifest)]
+                  (sut/write-html! build-state options))))
