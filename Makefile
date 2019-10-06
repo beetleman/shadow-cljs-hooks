@@ -1,6 +1,6 @@
 .PHONY: test
 
 test:
-	clojure -A:test -m kaocha.runner
+	clojure -A:dev -m kaocha.runner
 deploy:
 	mvn deploy

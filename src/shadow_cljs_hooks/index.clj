@@ -20,7 +20,9 @@
   (str (output-dir build-state) "/manifest.edn"))
 
 (defn get-manifest! [build-state]
-  (read-edn! get-manifest-path))
+  (-> build-state
+      get-manifest-path
+      read-edn!))
 
 (def entry-point-js-error-message
   "console.debug('shadow-cljs-hooks.index: ', 'no `:entry-point` provided.')")
