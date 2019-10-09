@@ -49,13 +49,41 @@ Optional because `:init-fn` in [modules configuration] can handle it
 #### example
 
 ``` clojure
-(shadow-cljs-hooks.index/hook {:links   ["https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"]
-                               :scripts ["https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"]})
+[(shadow-cljs-hooks.index/hook {:links   ["https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"]
+                               :scripts ["https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"]})]
 ```
 
 ### `shadow-cljs-hooks.fulcro-css`
 
-TODO
+Generate `CSS` files from [fulcro3] project. Works with `index` hook.
+
+#### requirements
+
+- [garden]
+- [fulcro3]
+
+#### options
+
+- `:output-dir` (required) the directory to use for [garden] output
+- `:asset-path` (required) the relative path from web server’s root to the resources
+in `:output-dir`
+- `:component` (required) `Root` component from which `CSS` will be generated
+- `:garden-flags` (optional, default `{:pretty-print? false}`) [garden] flags
+
+#### example
+
+``` clojure
+[(shadow-cljs-hooks.fulcro-css/hook {:component  app.main/Root
+                                     :output-dir "public/css"
+                                     :asset-path "/css"})
+ (shadow-cljs-hooks.index/hook)]
+```
+
+## TODO
+
+- [ ] pure garden hook
+- [ ] reagent example
+- [ ] code cleanup
 
 [shadow-cljs]: https://github.com/thheller/shadow-cljs
 [fulcro3]: https://github.com/fulcrologic/fulcro
