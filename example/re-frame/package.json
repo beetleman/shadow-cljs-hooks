@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "shadow-cljs": "^2.8.64"
+  }
+}

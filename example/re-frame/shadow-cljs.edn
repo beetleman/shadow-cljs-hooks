@@ -1,0 +1,19 @@
+{:deps  {:aliases [:dev]}
+ :nrepl {:middleware [refactor-nrepl.middleware/wrap-refactor]}
+
+ :builds {:app
+          {:target      :browser
+           :output-dir  "public/js"
+           :asset-path  "/js"
+           :build-hooks [(shadow-cljs-hooks.index/hook)]
+           :modules     {:main {:init-fn app.main/init
+                                :entries [app.main]}}
+
+           :release {:module-hash-names true
+                     :output-dir        "build/js"
+                     :build-hooks       [(shadow-cljs-hooks.index/hook)]}
+
+           :devtools {:after-load app.main/clear-cache-and-render!
+                      :http-root  "public"
+                      :http-port  8080
+                      :preloads [devtools.preload]}}}}
