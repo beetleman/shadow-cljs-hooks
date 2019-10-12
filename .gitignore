@@ -3,9 +3,3 @@
 .nrepl-port
 .rebl
 /target
-
-/example/node_modules
-/example/build/*
-!/example/build/.keep
-/example/public/*
-!/example/public/.keep
