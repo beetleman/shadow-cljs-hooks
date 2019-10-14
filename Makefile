@@ -2,10 +2,13 @@
 
 test:
 	clojure -A:dev -m kaocha.runner
-_test_release_fulcro:
-	cd ./example/fulcro3 && yarn shadow-cljs release app
-_test_release_re-frame:
+test_release:
 	cd ./example/re-frame && yarn shadow-cljs release app
-test_release:_test_release_fulcro _test_release_re-frame
+	cd ./example/fulcro3 && yarn shadow-cljs release app
+updata_all_deps:
+	clojure -Aoutdated -a outdated  --update
+	cd ./example/re-frame && yarn upgrade-interactive; clojure -Aoutdated -a outdated  --update
+	cd ./example/fulcro3 && yarn upgrade-interactive; clojure -Aoutdated -a outdated  --update
+	clojure -Spom
 deploy:
 	mvn deploy
