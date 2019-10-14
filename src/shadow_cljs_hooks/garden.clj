@@ -8,7 +8,7 @@
 
 (defn generate
   ([css-symbol]
-   (generate css-symbol {}))
+   (generate css-symbol {:pretty-print? false}))
   ([css-symbol garden-flags]
    (garden/css garden-flags (symbols/eval-symbol css-symbol))))
 
