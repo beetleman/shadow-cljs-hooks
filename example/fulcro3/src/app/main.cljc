@@ -33,7 +33,6 @@
   (dom/div :.root
            (ui-count-button button)))
 
-
 ;; -- APP --
 
 (defonce app (app/fulcro-app))

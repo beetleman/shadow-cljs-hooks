@@ -3,8 +3,8 @@
             [re-frame.core :as rf]
             [app.css :as css]))
 
-
 ;; -- EVENTS --
+
 (rf/reg-event-db ::initialize
                  (constantly {::counter 0}))
 
@@ -14,6 +14,7 @@
                    (update db ::counter inc)))
 
 ;; -- SUBS --
+
 (rf/reg-sub
   ::counter
   (fn [db _]
@@ -33,7 +34,6 @@
   []
   [:div {:class [css/root]}
    [count-button]])
-
 
 ;; -- ENTRY POINT --
 
