@@ -3,3 +3,4 @@
 .nrepl-port
 .rebl
 /target
+!.dir-locals.el

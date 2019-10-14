@@ -5,7 +5,7 @@
             [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
             [com.fulcrologic.fulcro.mutations :as m]))
 
-(defonce app (app/fulcro-app))
+;; -- UI --
 
 (defsc CountButton [this {::keys [counter]}]
   {:css           [[:.root {:background-color "#4CAF50"
@@ -32,6 +32,12 @@
                     {:ui/button (comp/get-initial-state CountButton)})}
   (dom/div :.root
            (ui-count-button button)))
+
+;; -- APP --
+
+(defonce app (app/fulcro-app))
+
+;; -- ENTRY POINT --
 
 (defn ^:export init
   "Shadow-cljs sets this up to be our entry-point function. See shadow-cljs.edn `:init-fn` in the modules of the main build."

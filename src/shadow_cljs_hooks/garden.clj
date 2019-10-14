@@ -1,37 +1,33 @@
-(ns shadow-cljs-hooks.fulcro-css
+(ns shadow-cljs-hooks.garden
   (:require [clojure.java.io :as io]
             [clojure.spec.alpha :as s]
-            [com.fulcrologic.fulcro-css.css-injection :as inj]
-            [shadow-cljs-hooks.spec :as hooks.spec]
+            [garden.core :as garden]
             [shadow-cljs-hooks.css :as hooks.css]
+            [shadow-cljs-hooks.spec :as hooks.spec]
             [shadow-cljs-hooks.symbols :as symbols]))
 
 (defn generate
-  ([component]
-   (generate component {:pretty-print? false}))
-  ([component garden-flags]
-   (inj/compute-css {:component    (symbols/eval-symbol component)
-                     :garden-flags garden-flags})))
+  ([css-symbol]
+   (generate css-symbol {:pretty-print? false}))
+  ([css-symbol garden-flags]
+   (garden/css garden-flags (symbols/eval-symbol css-symbol))))
 
-(def output-file-key ::output-file)
-(defn output-file [build-state]
-  (get build-state output-file-key))
-
-(s/def ::component symbol?)
+(s/def ::css symbol?)
 (s/def ::output-dir ::hooks.spec/not-empty-string)
 (s/def ::asset-path ::hooks.spec/not-empty-string)
-(s/def ::options (s/keys :req-un [::output-dir ::asset-path ::component]
+(s/def ::options (s/keys :req-un [::output-dir ::asset-path ::css]
                          :opt-un [::hooks.css/garden-flags]))
+
 
 (defn hook* [build-state
              options
              {:keys [write-css]}]
   {:pre [(hooks.spec/valid? ::hooks.spec/build-state build-state)
          (hooks.spec/valid? ::options options)]}
-  (let [{:keys [output-dir asset-path component]} options
-        output-dir                                (io/file output-dir)
-        file-name                                 "main.css"]
-    (write-css (generate component)
+  (let [{:keys [output-dir asset-path css]} options
+        output-dir                          (io/file output-dir)
+        file-name                           "main.css"]
+    (write-css (generate css)
                output-dir
                file-name)
     (hooks.css/assoc-path build-state (str asset-path "/" file-name))))
