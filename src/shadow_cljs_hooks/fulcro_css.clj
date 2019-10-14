@@ -3,14 +3,14 @@
             [clojure.spec.alpha :as s]
             [com.fulcrologic.fulcro-css.css-injection :as inj]
             [shadow-cljs-hooks.spec :as hooks.spec]
-            [shadow-cljs-hooks.css :as hooks.css]))
+            [shadow-cljs-hooks.css :as hooks.css]
+            [shadow-cljs-hooks.symbols :as symbols]))
 
 (defn generate
   ([component]
    (generate component {:pretty-print? false}))
   ([component garden-flags]
-   (require (symbol (namespace component)) :reload)
-   (inj/compute-css {:component (eval component)
+   (inj/compute-css {:component    (symbols/eval-symbol component)
                      :garden-flags garden-flags})))
 
 (def output-file-key ::output-file)
