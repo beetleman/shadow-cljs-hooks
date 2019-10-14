@@ -5,7 +5,10 @@
           {:target      :browser
            :output-dir  "public/js"
            :asset-path  "/js"
-           :build-hooks [(shadow-cljs-hooks.index/hook)]
+           :build-hooks [(shadow-cljs-hooks.garden/hook {:css        app.css/css
+                                                         :output-dir "public/css"
+                                                         :asset-path "/css"})
+                         (shadow-cljs-hooks.index/hook)]
            :modules     {:main {:init-fn app.main/init
                                 :entries [app.main]}}
 
@@ -16,4 +19,4 @@
            :devtools {:after-load app.main/clear-cache-and-render!
                       :http-root  "public"
                       :http-port  8080
-                      :preloads [devtools.preload]}}}}
+                      :preloads   [devtools.preload]}}}}

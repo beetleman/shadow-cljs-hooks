@@ -13,14 +13,11 @@
                  (fn [db _]
                    (update db ::counter inc)))
 
-
 ;; -- SUBS --
-
 (rf/reg-sub
   ::counter
   (fn [db _]
     (::counter db)))
-
 
 ;; -- UI --
 
