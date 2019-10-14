@@ -3,8 +3,7 @@
             [clojure.spec.alpha :as s]
             [com.fulcrologic.fulcro-css.css-injection :as inj]
             [shadow-cljs-hooks.spec :as hooks.spec]
-            [shadow-cljs-hooks.css :as css]
-            [taoensso.timbre :as log]))
+            [shadow-cljs-hooks.css :as hooks.css]))
 
 (defn generate
   ([component]
@@ -21,24 +20,8 @@
 (s/def ::component symbol?)
 (s/def ::output-dir ::hooks.spec/not-empty-string)
 (s/def ::asset-path ::hooks.spec/not-empty-string)
-
-;;TODO: spec garden
-;;TODO: PR to garden
-(s/def :garden/pretty-print? boolean?)
-(s/def :garden/output-to nil?) ; protect user form set it
-(s/def ::garden-flags (s/keys :opt-un [:garden/pretty-print? :garden/output-to]))
 (s/def ::options (s/keys :req-un [::output-dir ::asset-path ::component]
-                         :opt-un [::garden-flags]))
-
-(defn write-css! [css output-dir file-name]
-  (when-not (.exists output-dir)
-    (.mkdirs output-dir))
-  (try
-    (spit (str output-dir "/" file-name) css)
-    (log/info "css compiled")
-    (catch Exception e
-      (log/error "css compilation failed" e))))
-
+                         :opt-un [::hooks.css/garden-flags]))
 
 (defn hook* [build-state
              options
@@ -51,7 +34,7 @@
     (write-css (generate component)
                output-dir
                file-name)
-    (css/assoc-path build-state (str asset-path "/" file-name))))
+    (hooks.css/assoc-path build-state (str asset-path "/" file-name))))
 
 (defn hook
   {:shadow.build/stage :flush}
@@ -60,4 +43,4 @@
   ([build-state options]
    (hook* build-state
           options
-          {:write-css write-css!})))
+          {:write-css hooks.css/write!})))
