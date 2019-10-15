@@ -27,7 +27,7 @@ Add some [build hook] to `shadow-cljs.edn`, eg. `shadow-cljs-hooks.index/hook`:
         ...}}}}
 ```
 
-checkout [fulcro3 example] to seeing it in action.
+checkout [fulcro3 example] or [re-frame example] to seeing it in action.
 
 ## Hooks
 
@@ -52,6 +52,7 @@ Optional because `:init-fn` in [modules configuration] can handle it
 [(shadow-cljs-hooks.index/hook {:links   ["https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"]
                                :scripts ["https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"]})]
 ```
+Used in More in [re-frame example] and [fulcro3 example]
 
 ### `shadow-cljs-hooks.fulcro-css`
 
@@ -79,15 +80,45 @@ in `:output-dir`
  (shadow-cljs-hooks.index/hook)]
 ```
 
+More in [fulcro3 example]
+
+### `shadow-cljs-hooks.garden`
+
+Generate `CSS` files from [garden] compatible vector. Works with `index` hook as well.
+
+#### requirements
+
+- [garden]
+
+#### options
+
+- `:output-dir` (required) the directory to use for [garden] output
+- `:asset-path` (required) the relative path from web server’s root to the resources
+in `:output-dir`
+- `:css` (required) symbol with definition of styles
+- `:garden-flags` (optional, default `{:pretty-print? false}`) [garden] flags
+
+#### example
+
+``` clojure
+[(shadow-cljs-hooks.garden/hook {:css        app.css/css
+                                 :output-dir "public/css"
+                                 :asset-path "/css"})
+ (shadow-cljs-hooks.index/hook)]
+```
+
+More in [re-frame example]
+
 ## TODO
 
-- [ ] pure garden hook
-- [ ] reagent example
+- [x] pure garden hook
+- [x] reagent/reframe example
 - [ ] code cleanup
 
 [shadow-cljs]: https://github.com/thheller/shadow-cljs
 [fulcro3]: https://github.com/fulcrologic/fulcro
 [garden]: https://github.com/noprompt/garden
 [build hook]: https://shadow-cljs.github.io/docs/UsersGuide.html#build-hooks
-[fulcro3 example]: ./example
+[fulcro3 example]: ./example/fulcro3
+[re-frame example]: ./example/re-frame
 [modules configuration]: https://shadow-cljs.github.io/docs/UsersGuide.html#_modules
